@@ -116,6 +116,17 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
 
+  titleErro: {
+    color: colors.erro,
+    fontWeight: 'bold',
+    fontSize: 13,
+    margin: 10,
+    textAlign: 'center',
+  },
+
+  loading: {
+    marginHorizontal: 25,
+  },
 
 });
 

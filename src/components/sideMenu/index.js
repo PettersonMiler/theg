@@ -10,7 +10,7 @@ const SideMenu = ({ navigation }) => (
     <View style={styles.imagem}>
       <Image style={styles.imagem} source={require('images/thegIcon.png')} />
     </View>
-    <Text style={styles.textNome}>Petterson Miler</Text>
+    <Text style={styles.textNome}>Joyce Almeida</Text>
     <TouchableOpacity onPress={() => navigation.navigate('Perfil')} style={styles.botao}>
       <Icons name="exchange" size={19} style={styles.icon} />
       <Text style={styles.textAba}>Trocar Perfil</Text>
@@ -34,11 +34,12 @@ const SideMenu = ({ navigation }) => (
       <Icons name="user-o" size={21} style={styles.icon} />
       <Text style={styles.textAba}>Conta</Text>
     </TouchableOpacity>
-    <TouchableOpacity onPress={() => navigation.navigate('Main')} style={styles.botaoSair}>
-      <Icons name="sign-in" size={21} style={styles.icon} />
-      <Text style={styles.textAba}>Sair</Text>
-    </TouchableOpacity>
-
+    <View style={styles.containerSair}>
+      <TouchableOpacity onPress={() => navigation.navigate('Main')} style={styles.botaoSair}>
+        <Icons name="sign-in" size={21} style={styles.icon} />
+        <Text style={styles.textAba}>Sair</Text>
+      </TouchableOpacity>
+    </View>
   </View>
 );
 

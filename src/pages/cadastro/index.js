@@ -9,7 +9,12 @@ import {
   Text,
   TouchableOpacity,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import { Creators as UsuarioActions } from 'store/ducks/usuario';
+import TextInputMask from 'react-native-text-input-mask';
 import PropTypes from 'prop-types';
 import { CheckBox } from 'react-native-elements';
 import styles from './styles';
@@ -26,17 +31,19 @@ class Cadastro extends Component {
   };
 
   state = {
-    nome: '',
-    usuario: '',
-    email: '',
-    cpf: '',
-    nascimento: '',
-    senha: '',
-    confSenha: '',
-    guia: false,
-    turista: false,
+    usuario: {
+      nome: '',
+      user: '',
+      email: '',
+      cpf: '',
+      nascimento: '',
+      guia: false,
+      turista: false,
+    },
     ambos: false,
     disabled: false,
+    senha: '',
+    confSenha: '',
   };
 
   validaVoltar = () => {
@@ -49,30 +56,183 @@ class Cadastro extends Component {
   check = () => {
     if (this.state.ambos) {
       this.setState({
-        guia: false,
-        turista: false,
+        usuario: {
+          ...this.state.usuario,
+          guia: false,
+          turista: false,
+        },
         ambos: false,
         disabled: false,
       });
     } else {
       this.setState({
-        guia: true,
-        turista: true,
+        usuario: {
+          ...this.state.usuario,
+          guia: true,
+          turista: true,
+        },
         ambos: true,
         disabled: true,
       });
     }
   };
 
+  validaEmail = (email) => {
+    const reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    if (reg.test(email) === false) {
+      return false;
+    }
+    return true;
+  }
+
+  idade = (aniversario) => {
+    const nascimento = aniversario.split('/');
+    const dataNascimento = new Date(
+      parseInt(nascimento[2], 10),
+      parseInt(nascimento[1], 10) - 1,
+      parseInt(nascimento[0], 10),
+    );
+
+    const diferenca = Date.now() - dataNascimento.getTime();
+    const idade = new Date(diferenca);
+    return Math.abs(idade.getUTCFullYear() - 1970);
+  }
+
+  validarCPF = (cpfInp) => {
+    const cpf = cpfInp.replace(/[^\d]+/g, '');
+    if (cpf === '') return false;
+    // Elimina CPFs invalidos conhecidos
+    if (cpf.length !== 11 ||
+      cpf === '00000000000' ||
+      cpf === '11111111111' ||
+      cpf === '22222222222' ||
+      cpf === '33333333333' ||
+      cpf === '44444444444' ||
+      cpf === '55555555555' ||
+      cpf === '66666666666' ||
+      cpf === '77777777777' ||
+      cpf === '88888888888' ||
+      cpf === '99999999999') { return false; }
+    // Valida 1o digito
+    let add = 0;
+    for (let i = 0; i < 9; i += 1) { add += parseInt(cpf.charAt(i)) * (10 - i); }
+    let rev = 11 - (add % 11);
+    if (rev === 10 || rev === 11) {
+      rev = 0;
+    }
+    if (rev !== parseInt(cpf.charAt(9))) { return false; }
+    // Valida 2o digito
+    add = 0;
+    for (let i = 0; i < 10; i += 1) {
+      add += parseInt(cpf.charAt(i)) * (11 - i);
+    }
+    rev = 11 - (add % 11);
+    if (rev === 10 || rev === 11) {
+      rev = 0;
+    }
+    if (rev !== parseInt(cpf.charAt(10))) {
+      return false;
+    }
+    return true;
+  }
+
   submit = () => {
+    console.tron.log(this.state.usuario.nome);
+    if (!this.state.usuario.nome) {
+      Alert.alert(
+        'Nome não informado',
+        'Favor informar um nome.',
+      );
+      return;
+    }
+
+    if (!this.state.usuario.user) {
+      Alert.alert(
+        'Usuário não informado',
+        'Favor informar um usuário.',
+      );
+      return;
+    }
+
+    if (!this.state.usuario.email) {
+      Alert.alert(
+        'Email não informado',
+        'Favor informar um e-mail valido.',
+      );
+      return;
+    }
+
+    if (!this.validaEmail(this.state.usuario.email)) {
+      Alert.alert(
+        'Email invalido',
+        'Favor informar um e-mail valido.',
+      );
+      return;
+    }
+
+    if (!this.state.usuario.cpf) {
+      Alert.alert(
+        'CPF não informado',
+        'Favor informar um CPF valido.',
+      );
+      return;
+    }
+
+    if (!this.validarCPF(this.state.usuario.cpf)) {
+      Alert.alert(
+        'CPF Incorreto',
+        'Favor informar um CPF valido.',
+      );
+      return;
+    }
+
+    if (!this.state.usuario.nascimento) {
+      Alert.alert(
+        'Data de nascimento não informada',
+        'Favor informar uma data de nascimento valida.',
+      );
+      return;
+    }
+
+    if (this.idade(this.state.usuario.nascimento) < 18) {
+      Alert.alert(
+        'Idade menor que 18 anos',
+        'Só é possivel realizar cadastro maiores de 18 anos.',
+      );
+      return;
+    }
+
+    if (!this.state.senha) {
+      Alert.alert(
+        'Senhas não informada',
+        'Favor informar uma senha valida.',
+      );
+      return;
+    }
+
     if (this.state.senha !== this.state.confSenha) {
-      console.tron.log('aqui');
       Alert.alert(
         'Senhas incorretas',
         'Favor verificar e tentar novamente.',
       );
+      return;
     }
-  }
+
+    if (!this.state.usuario.guia && !this.state.usuario.turista) {
+      Alert.alert(
+        'Pefil não informado',
+        'Favor informar o perfil.',
+      );
+      return;
+    }
+
+    this.props.UsuarioActions.postUserLogin(
+      this.state.usuario.email,
+      this.state.senha,
+      this.state.usuario,
+    );
+  };
+
   render() {
     console.tron.log(this.props.navigation);
     return (
@@ -92,7 +252,7 @@ class Cadastro extends Component {
             onSubmitEditing={() => this.inputUsuario.focus()}
             keyboardType="email-address"
             // value={String(product.qtt)}
-            onChangeText={nome => this.setState({ nome })}
+            onChangeText={nome => this.setState({ usuario: { ...this.state.usuario, nome } })}
           />
 
           <TextInput
@@ -105,7 +265,7 @@ class Cadastro extends Component {
             onSubmitEditing={() => this.inputEmail.focus()}
             ref={(input) => { this.inputUsuario = input; }}
             // value={String(product.qtt)}
-            onChangeText={usuario => this.setState({ usuario })}
+            onChangeText={user => this.setState({ usuario: { ...this.state.usuario, user } })}
           />
 
           <TextInput
@@ -118,11 +278,11 @@ class Cadastro extends Component {
             onSubmitEditing={() => this.inputCpf.focus()}
             ref={(input) => { this.inputEmail = input; }}
             // value={String(product.qtt)}
-            onChangeText={email => this.setState({ email })}
+            onChangeText={email => this.setState({ usuario: { ...this.state.usuario, email } })}
           />
 
           <View style={styles.cpfNasc}>
-            <TextInput
+            <TextInputMask
               style={styles.inputCpf}
               autoCorrect={false}
               autoCapitalize="none"
@@ -130,12 +290,14 @@ class Cadastro extends Component {
               placeholderTextColor="#2c4eb8"
               underlineColorAndroid="transparent"
               onSubmitEditing={() => this.inputNasc.focus()}
-              ref={(input) => { this.inputCpf = input; }}
+              refInput={(input) => { this.inputCpf = input; }}
               // value={String(product.qtt)}
-              onChangeText={cpf => this.setState({ cpf })}
+              onChangeText={cpf => this.setState({ usuario: { ...this.state.usuario, cpf } })}
+              mask="[000] [000] [000]-[00]"
+              keyboardType="numeric"
             />
 
-            <TextInput
+            <TextInputMask
               style={styles.inputNasc}
               autoCorrect={false}
               autoCapitalize="none"
@@ -143,9 +305,13 @@ class Cadastro extends Component {
               placeholderTextColor="#2c4eb8"
               underlineColorAndroid="transparent"
               onSubmitEditing={() => this.inputSenha.focus()}
-              ref={(input) => { this.inputNasc = input; }}
+              refInput={(input) => { this.inputNasc = input; }}
               // value={String(product.qtt)}
-              onChangeText={nascimento => this.setState({ nascimento })}
+              onChangeText={nascimento => (
+                this.setState({ usuario: { ...this.state.usuario, nascimento } })
+              )}
+              mask="[00]/[00]/[0000]"
+              keyboardType="numeric"
             />
           </View>
 
@@ -176,6 +342,10 @@ class Cadastro extends Component {
             onChangeText={confSenha => this.setState({ confSenha })}
           />
 
+          { this.props.usuario.erro
+          ? <Text style={styles.titleErro}>E-mail já está sendo usado.</Text>
+          : null}
+
           <Text style={styles.textPerfil}>Perfil desejado</Text>
           <View style={styles.box}>
             <CheckBox
@@ -184,8 +354,12 @@ class Cadastro extends Component {
               uncheckedColor={this.state.disabled ? '#ffa170' : '#ff7025'}
               textStyle={[styles.textBox, this.state.disabled ? styles.checkDesabilitado : null]}
               containerStyle={styles.check}
-              onPress={() => this.setState({ guia: !this.state.guia })}
-              checked={this.state.guia}
+              onPress={() => (
+                this.setState({
+                  usuario: { ...this.state.usuario, guia: !this.state.usuario.guia },
+                })
+              )}
+              checked={this.state.usuario.guia}
               disabled={this.state.disabled}
             />
             <CheckBox
@@ -194,8 +368,13 @@ class Cadastro extends Component {
               uncheckedColor={this.state.disabled ? '#ffa170' : '#ff7025'}
               textStyle={[styles.textBox, this.state.disabled ? styles.checkDesabilitado : null]}
               containerStyle={styles.check}
-              checked={this.state.turista}
-              onPress={() => this.setState({ turista: !this.state.turista })}
+              checked={this.state.usuario.turista}
+              onPress={() => this.setState({
+                usuario: {
+                  ...this.state.usuario,
+                  turista: !this.state.usuario.turista,
+                },
+              })}
               disabled={this.state.disabled}
             />
             <CheckBox
@@ -213,7 +392,9 @@ class Cadastro extends Component {
               <Text style={styles.titleCan}>Cancelar</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => this.submit()} style={styles.buttonConf}>
-              <Text style={styles.titleConf}>Confirmar</Text>
+              { this.props.usuario.loading
+              ? <ActivityIndicator size="small" color="#FFF" style={styles.loading} />
+              : <Text style={styles.titleConf}>Confirmar</Text>}
             </TouchableOpacity>
           </View>
         </View>
@@ -222,4 +403,14 @@ class Cadastro extends Component {
   }
 }
 
-export default Cadastro;
+const mapStateToProps = state => ({
+  usuario: state.usuario,
+});
+
+function mapDispatchToProps(dispatch) {
+  return {
+    UsuarioActions: bindActionCreators(UsuarioActions, dispatch),
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Cadastro);

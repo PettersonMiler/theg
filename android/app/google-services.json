@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "850815236422",
+    "firebase_url": "https://theg-1110.firebaseio.com",
+    "project_id": "theg-1110",
+    "storage_bucket": "theg-1110.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:850815236422:android:2bbae547c636ab47",
+        "android_client_info": {
+          "package_name": "com.theg"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "850815236422-9j793r9k56m1o1mspmeblvhjuv6nt1ap.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyChYXWOm-A5c5YEicYpUnVxQaC3RP0NcVI"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -35,6 +35,11 @@ const styles = StyleSheet.create({
     padding: 10,
     marginHorizontal: 95,
     borderRadius: 5,
+    paddingHorizontal: 10,
+  },
+
+  loading: {
+    paddingHorizontal: 20,
   },
 
   titleAces: {
@@ -52,6 +57,13 @@ const styles = StyleSheet.create({
     color: colors.primaria,
     fontSize: 15,
     textDecorationLine: 'underline',
+  },
+
+  titleErro: {
+    color: 'red',
+    fontWeight: 'bold',
+    fontSize: 13,
+    marginBottom: 10,
   },
 
 });

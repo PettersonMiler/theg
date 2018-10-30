@@ -6,11 +6,17 @@ import {
   TouchableOpacity,
   Text,
 } from 'react-native';
+
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import { Creators as UsuarioActions } from 'store/ducks/usuario';
+
 import PropTypes from 'prop-types';
 import styles from './styles';
 
-const Perfil = ({ navigation }) => {
-  console.tron.log(navigation);
+const Perfil = ({ navigation, usuario }) => {
+  console.tron.log('usuario');
+  console.tron.log(usuario);
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
@@ -36,4 +42,14 @@ Perfil.propTypes = {
   }).isRequired,
 };
 
-export default Perfil;
+const mapStateToProps = state => ({
+  usuario: state.usuario,
+});
+
+function mapDispatchToProps(dispatch) {
+  return {
+    UsuarioActions: bindActionCreators(UsuarioActions, dispatch),
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Perfil);

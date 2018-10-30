@@ -13,7 +13,9 @@
     "react": "16.3.1",
     "react-native": "0.55.4",
     "react-native-elements": "^0.19.1",
-    "react-native-vector-icons": "^4.6.0",
+    "react-native-firebase": "4.0.3",
+    "react-native-text-input-mask": "^0.8.0",
+    "react-native-vector-icons": "4.6.0",
     "react-navigation": "^2.2.5",
     "react-redux": "^5.0.7",
     "redux": "^4.0.0",
@@ -33,8 +35,8 @@
     "jest": "23.1.0",
     "react-test-renderer": "16.3.1",
     "reactotron-react-native": "1.14.0",
-    "reactotron-redux": "^1.13.0",
-    "reactotron-redux-saga": "^1.13.0"
+    "reactotron-redux": "1.13.0",
+    "reactotron-redux-saga": "1.13.0"
   },
   "jest": {
     "preset": "react-native"

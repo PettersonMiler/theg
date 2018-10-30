@@ -35,9 +35,14 @@ const styles = StyleSheet.create({
     color: colors.primaria,
   },
 
+  containerSair: {
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+
   botaoSair: {
     flexDirection: 'row',
-    marginTop: 150,
+    //marginTop: 150,
     alignItems: 'center',
   },
 
